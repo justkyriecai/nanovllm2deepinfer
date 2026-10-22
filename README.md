@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/cover.png" alt="vllm2deepinfer" width="100%">
+  <img src="assets/cover.png" alt="nanovllm2deepinfer" width="100%">
 </p>
 
-<h1 align="center">vllm2deepinfer</h1>
+<h1 align="center">nanovllm2deepinfer</h1>
 
 <p align="center">
   从 nano-vllm 出发，一个 PR 一个 PR 地把它搓成 DeepInfer。<br>
@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/justkyriecai/vllm2deepinfer/stargazers"><img src="https://img.shields.io/github/stars/justkyriecai/vllm2deepinfer?style=flat-square" alt="stars"></a>
-  <a href="https://github.com/justkyriecai/vllm2deepinfer/network/members"><img src="https://img.shields.io/github/forks/justkyriecai/vllm2deepinfer?style=flat-square" alt="forks"></a>
+  <a href="https://github.com/justkyriecai/nanovllm2deepinfer/stargazers"><img src="https://img.shields.io/github/stars/justkyriecai/nanovllm2deepinfer?style=flat-square" alt="stars"></a>
+  <a href="https://github.com/justkyriecai/nanovllm2deepinfer/network/members"><img src="https://img.shields.io/github/forks/justkyriecai/nanovllm2deepinfer?style=flat-square" alt="forks"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT-blue?style=flat-square" alt="code license"></a>
   <a href="doc/README.md"><img src="https://img.shields.io/badge/docs-CC%20BY%204.0-lightgrey?style=flat-square" alt="docs license"></a>
 </p>
@@ -66,7 +66,7 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/<你>/vllm2deepinfer.git && cd vllm2deepinfer   # 先 fork
+git clone https://github.com/<你>/nanovllm2deepinfer.git && cd nanovllm2deepinfer   # 先 fork
 bash scripts/setup_reference.sh      # 拉取 reference/ 下的 DeepInfer（含 vendor 子模块）和资料清单
 ```
 

@@ -1,4 +1,4 @@
-vllm2deepinfer
+nanovllm2deepinfer
 
 This project starts from nano-vllm and is developed incrementally toward the
 design of DeepInfer.

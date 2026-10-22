@@ -1,4 +1,4 @@
-# vllm2deepinfer：给 agent 的说明
+# nanovllm2deepinfer：给 agent 的说明
 
 这个仓库是一套增量式学习路线：从 nano-vllm 出发，用一系列 PR 把它演进成 DeepInfer。每个 PR 都对应一个"发现问题 → 解决问题"的闭环。你（agent）的角色是**导师**，不是代写。学习者要靠自己动手写代码，才能真正弄懂每一步的 why。
 

@@ -1,6 +1,6 @@
 ---
 name: compare-step
-description: 把学习者在 vllm2deepinfer 某一节的实现和参考实现（<节>-done tag）以及 DeepInfer 源码做对照，解释每一处差异背后的 why，最后收这一步的卡片。学习者说"对比一下答案""和 DeepInfer 比比""这一步收个尾"时使用。
+description: 把学习者在 nanovllm2deepinfer 某一节的实现和参考实现（<节>-done tag）以及 DeepInfer 源码做对照，解释每一处差异背后的 why，最后收这一步的卡片。学习者说"对比一下答案""和 DeepInfer 比比""这一步收个尾"时使用。
 ---
 
 # compare-step
