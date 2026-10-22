@@ -16,7 +16,7 @@
   <a href="doc/README.md"><img src="https://img.shields.io/badge/docs-CC%20BY%204.0-lightgrey?style=flat-square" alt="docs license"></a>
 </p>
 
-> **状态**：第 1 章文档完成，第 2 章写作中。进度见 [doc/README.md](doc/README.md#8-进度)。
+> **状态**：第 1、2 章文档完成（13/34 节），第 3 章写作中。进度见 [doc/README.md](doc/README.md#8-进度)。
 
 ## 关于
 
@@ -53,7 +53,7 @@
 | 章 | 节 | 内容 | 硬件 | 状态 |
 |---|---|---|---|---|
 | **1 地基** | [1.1](doc/1.1-观测与正确性.md) | 观测工具与正确性回归 | 任意 GPU | ✅ |
-| **2 引擎控制面** | 2.1–2.12 | 请求状态机 → P/D 交替 → 抢占 → fork → 对象池 → C++ 调度器 → ZOS → 投机解码（EAGLE-3）→ 变长验证 → 采样器 → 结构化输出 → batch-invariant | 1×H100，Qwen3-8B | ⬜ |
+| **2 引擎控制面** | [2.1](doc/2.1-请求状态机.md)–[2.12](doc/2.12-batch-invariant.md) | 请求状态机 → P/D 交替 → 抢占 → fork → 对象池 → C++ 调度器 → ZOS → 投机解码（EAGLE-3）→ 变长验证 → 采样器 → 结构化输出 → batch-invariant | 1×H100，Qwen3-8B | ✅ |
 | **3 MLA + MoE** | 3.1–3.3 | MLA → MoE → FP8 | 1×H100，DeepSeek-V2-Lite | ⬜ |
 | **4 V4.1-Flash 逐层** | 4.1–4.11 | 多 cache 共存 → SWA 环 → 压缩 KV → 稀疏 indexer → YoCo → 跨层共享 → mHC → engram → Mega MoE → DFlash → 自己写 kernel | 1×B200 | ⬜ |
 | **5 分布式** | 5.1–5.7 | DP+EP → DeepEP → 步型一致 → EPLB → CP → P/D 引擎拆分 → 全模型期末考试 | 8×H100；5.7 用 8×B200 | ⬜ |
