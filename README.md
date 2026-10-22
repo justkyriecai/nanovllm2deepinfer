@@ -10,15 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/justkyriecai/nanovllm2deepinfer/stargazers"><img src="https://img.shields.io/github/stars/justkyriecai/nanovllm2deepinfer?style=flat-square&logo=github&color=f5c518" alt="stars"></a>
-  <a href="https://github.com/justkyriecai/nanovllm2deepinfer/network/members"><img src="https://img.shields.io/github/forks/justkyriecai/nanovllm2deepinfer?style=flat-square&logo=github&color=8a8a8a" alt="forks"></a>
-  <a href="https://github.com/justkyriecai/nanovllm2deepinfer/commits/main"><img src="https://img.shields.io/github/last-commit/justkyriecai/nanovllm2deepinfer?style=flat-square&logo=git&logoColor=white" alt="last commit"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/justkyriecai/nanovllm2deepinfer?style=flat-square&label=code" alt="code license"></a>
-  <a href="doc/README.md"><img src="https://img.shields.io/badge/docs-CC_BY_4.0-lightgrey?style=flat-square&logo=creativecommons&logoColor=white" alt="docs license"></a>
-</p>
-
-<p align="center">
   <a href="doc/README.md#8-进度"><img src="https://img.shields.io/badge/progress-0%2F34_sections-orange?style=flat-square" alt="progress"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT-blue?style=flat-square" alt="code license"></a>
+  <a href="doc/README.md"><img src="https://img.shields.io/badge/docs-CC_BY_4.0-lightgrey?style=flat-square&logo=creativecommons&logoColor=white" alt="docs license"></a>
   <img src="https://img.shields.io/badge/python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
   <img src="https://img.shields.io/badge/GPU-H100_%7C_B200-76B900?style=flat-square&logo=nvidia&logoColor=white" alt="gpu">
   <a href="https://github.com/GeeeekExplorer/nano-vllm"><img src="https://img.shields.io/badge/from-nano--vllm-6c757d?style=flat-square" alt="from nano-vllm"></a>
