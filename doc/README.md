@@ -197,3 +197,14 @@ DeepInfer 开源版只留了钩子，这部分只能照官方文档做简化版�
 - [x] 3.1 MLA（[文档](3.1-MLA.md)）
 - [x] 3.2 MoE（[文档](3.2-MoE.md)）
 - [x] 3.3 FP8（[文档](3.3-FP8.md)）
+- [x] 4.1 多 cache 共存（[文档](4.1-多cache共存.md)）
+- [x] 4.2 SWA 环 + sink（[文档](4.2-SWA环与sink.md)）
+- [x] 4.3 MLA 压缩 KV（[文档](4.3-压缩KV.md)）
+- [x] 4.4 稀疏 indexer（[文档](4.4-稀疏indexer.md)）
+- [x] 4.5 YoCo + bounded replay（[文档](4.5-YoCo.md)）
+- [x] 4.6 跨层共享（[文档](4.6-跨层共享.md)）
+- [x] 4.7 mHC（[文档](4.7-mHC.md)）
+- [x] 4.8 engram（[文档](4.8-engram.md)）
+- [x] 4.9 Mega MoE + FP4 专家（[文档](4.9-MegaMoE与FP4.md)）
+- [x] 4.10 DFlash + 置信度头（[文档](4.10-DFlash.md)）
+- [x] 4.11 自己写 kernel（[文档](4.11-自己写kernel.md)）
