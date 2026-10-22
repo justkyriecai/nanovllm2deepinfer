@@ -1,0 +1,26 @@
+vllm2deepinfer
+
+This project starts from nano-vllm and is developed incrementally toward the
+design of DeepInfer.
+
+nano-vllm
+  https://github.com/GeeeekExplorer/nano-vllm
+  Copyright (c) 2025 Xingkai Yu
+  Licensed under the MIT License (see LICENSE).
+  The initial code of this repository (tag `baseline`, commit bb823b3) is
+  nano-vllm. Later changes are modifications of that code.
+
+DeepInfer
+  https://github.com/deepseek-ai/DeepInfer
+  Licensed under the Apache License, Version 2.0.
+  Included as a git submodule under reference/DeepInfer for reading only; it is
+  not part of this project's build. Any code in this repository that is adapted
+  from DeepInfer is marked at the place where it is used.
+
+gpu-perf-engineering-resources
+  https://github.com/wafer-ai/gpu-perf-engineering-resources
+  Licensed under the MIT License.
+  Included as a git submodule under reference/gpu-perf-engineering-resources
+  as the preferred reading list.
+
+This project is not affiliated with or endorsed by DeepSeek.

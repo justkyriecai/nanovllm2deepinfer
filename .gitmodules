@@ -1,0 +1,6 @@
+[submodule "reference/DeepInfer"]
+	path = reference/DeepInfer
+	url = https://github.com/deepseek-ai/DeepInfer.git
+[submodule "reference/gpu-perf-engineering-resources"]
+	path = reference/gpu-perf-engineering-resources
+	url = https://github.com/wafer-ai/gpu-perf-engineering-resources.git

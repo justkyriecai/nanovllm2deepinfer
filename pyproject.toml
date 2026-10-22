@@ -25,3 +25,13 @@ Homepage="https://github.com/GeeeekExplorer/nano-vllm"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["nanovllm*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["reference", ".git"]
+
+[tool.ruff]
+extend-exclude = ["reference"]
+
+[tool.pyright]
+exclude = ["reference", "**/__pycache__"]
