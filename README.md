@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/cover.png" alt="nanovllm2deepinfer" width="100%">
+  <img src="assets/cover.jpg" alt="nanovllm2deepinfer" width="100%">
 </p>
 
 <h1 align="center">nanovllm2deepinfer</h1>
