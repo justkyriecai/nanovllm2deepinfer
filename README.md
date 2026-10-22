@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="doc/README.md#8-进度"><img src="https://img.shields.io/badge/progress-27%2F34_sections-orange?style=flat-square" alt="progress"></a>
+  <a href="doc/README.md#8-进度"><img src="https://img.shields.io/badge/progress-34%2F34_sections-brightgreen?style=flat-square" alt="progress"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT-blue?style=flat-square" alt="code license"></a>
   <a href="doc/README.md"><img src="https://img.shields.io/badge/docs-CC_BY_4.0-lightgrey?style=flat-square&logo=creativecommons&logoColor=white" alt="docs license"></a>
   <img src="https://img.shields.io/badge/python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="python">
@@ -20,7 +20,7 @@
   <a href="AGENTS.md"><img src="https://img.shields.io/badge/agent-ready-d97757?style=flat-square&logo=anthropic&logoColor=white" alt="agent ready"></a>
 </p>
 
-> **状态**：第 1–4 章文档完成（27/34 节），第 5 章写作中。进度见 [doc/README.md](doc/README.md#8-进度)。
+> **状态**：第 1–5 章文档完成（34/34 节）；第 6 章（系统层）可选，未写。参考实现由学习者和维护者逐节验证后打 `<节>-done` tag。进度见 [doc/README.md](doc/README.md#8-进度)。
 
 ## 关于
 
@@ -60,7 +60,7 @@
 | **2 引擎控制面** | [2.1](doc/2.1-请求状态机.md)–[2.12](doc/2.12-batch-invariant.md) | 请求状态机 → P/D 交替 → 抢占 → fork → 对象池 → C++ 调度器 → ZOS → 投机解码（EAGLE-3）→ 变长验证 → 采样器 → 结构化输出 → batch-invariant | 1×H100，Qwen3-8B | ✅ |
 | **3 MLA + MoE** | [3.1](doc/3.1-MLA.md)–[3.3](doc/3.3-FP8.md) | MLA → MoE → FP8 | 1×H100，DeepSeek-V2-Lite | ✅ |
 | **4 V4.1-Flash 逐层** | [4.1](doc/4.1-多cache共存.md)–[4.11](doc/4.11-自己写kernel.md) | 多 cache 共存 → SWA 环 → 压缩 KV → 稀疏 indexer → YoCo → 跨层共享 → mHC → engram → Mega MoE → DFlash → 自己写 kernel | 1×B200 | ✅ |
-| **5 分布式** | 5.1–5.7 | DP+EP → DeepEP → 步型一致 → EPLB → CP → P/D 引擎拆分 → 全模型期末考试 | 8×H100；5.7 用 8×B200 | ⬜ |
+| **5 分布式** | [5.1](doc/5.1-DP与EP.md)–[5.7](doc/5.7-V4.1-Flash全模型.md) | DP+EP → DeepEP → 步型一致 → EPLB → CP → P/D 引擎拆分 → 全模型期末考试 | 8×H100；5.7 用 8×B200 | ✅ |
 | **6 系统层**（可选） | 6.1–6.5 | KV 分层存储、E/P/D 服务、负载均衡、扩缩容、Recipe | 不定 | ⬜ |
 
 📝 写作中　⬜ 计划中　✅ 文档完成（PR 要做什么已经写清楚）

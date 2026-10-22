@@ -208,3 +208,10 @@ DeepInfer 开源版只留了钩子，这部分只能照官方文档做简化版�
 - [x] 4.9 Mega MoE + FP4 专家（[文档](4.9-MegaMoE与FP4.md)）
 - [x] 4.10 DFlash + 置信度头（[文档](4.10-DFlash.md)）
 - [x] 4.11 自己写 kernel（[文档](4.11-自己写kernel.md)）
+- [x] 5.1 DP + EP（[文档](5.1-DP与EP.md)）
+- [x] 5.2 DeepEP（[文档](5.2-DeepEP.md)）
+- [x] 5.3 DP 步型一致（[文档](5.3-DP步型一致.md)）
+- [x] 5.4 EPLB（[文档](5.4-EPLB.md)）
+- [x] 5.5 CP（[文档](5.5-CP.md)）
+- [x] 5.6 引擎类型与 PD 接缝（[文档](5.6-引擎类型与PD接缝.md)）
+- [x] 5.7 V4.1-Flash 全模型（[文档](5.7-V4.1-Flash全模型.md)）
