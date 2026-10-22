@@ -12,7 +12,15 @@
 - `doc/cards/`：每一步结束时收的卡片。
 - `reference/DeepInfer/`：DeepInfer 源码，是一个 git submodule，固定在某个 commit。vendor 下的 FlashMLA、DeepGEMM、DeepEP、DeepSelect 也在里面。
 - `reference/gpu-perf-engineering-resources/`：理论资料清单（submodule），见下文"资料引用"。
+- `LEARNERS.md`：一起学习的人和各自的进度分支。
 - 起点代码是 tag `baseline`（nano-vllm `bb823b3`），可以用 `git show baseline:<路径>` 查看。
+
+## 分支
+
+- `main`：公开的原始版本。只有文档、路线、skill 和 nano-vllm 的起点代码，**永远不含任何一节的实现**。只收文档修正和 `LEARNERS.md` 的 PR。
+- `kyrie-main`：维护者自己的学习进展。每一节做完合进来并打 `<节>-done` tag，可以当参考答案。
+- `<名字>-main`：每个学习者在自己 fork 里从 `main` 切出的进度分支。每一节在 `learn/<节>` 上做，PR 合回 `<名字>-main`，**不要提到上游的 `main`**。
+- 上游地址 `https://github.com/justkyriecai/nanovllm2deepinfer`，`scripts/setup_reference.sh` 会把它加成 `upstream`。文档更新靠 `git merge upstream/main`。
 
 ## 核心原则
 
@@ -65,9 +73,9 @@
 | 发现 + 分析 | `start-step <节>` | 准备分支；给方向和实验，让问题暴露出来；引导学习者分析到本质；读 DeepInfer 的解法；标出 TODO 的位置 |
 | 解决 | （学习者自己写） | 按导师模式引导 |
 | 验收 | `check-step <节>` | 用同一个实验重跑，再跑测试，确认问题消失并能解释原因；用新浮现的瓶颈引出路线图的下一步 |
-| 对照 | `compare-step <节>` | 和参考实现（`<节>-done` tag）以及 DeepInfer 做 diff，解释差异和背后的 why |
+| 对照 | `compare-step <节>` | 和参考实现（`upstream/kyrie-main` 的 `<节>-done` tag，或 `LEARNERS.md` 里走在前面的人的分支）以及 DeepInfer 做 diff，解释差异和背后的 why |
 
-学习者的分支命名为 `learn/<节>`，PR 提到**学习者自己 fork 的 main**，不要提到上游。
+学习者的分支命名为 `learn/<节>`，PR 提到**学习者自己 fork 的 `<名字>-main`**，不要提到上游。做完一节提醒他改 `LEARNERS.md` 里自己那一行，PR 到上游 `main`。
 
 ## 某一步的文档还没写时
 

@@ -9,7 +9,7 @@ description: 验收 nanovllm2deepinfer 某一节的实现：用发现问题时�
 
 ## 1. 重跑发现问题时的实验
 
-- 用文档第 1 节（或者 `start-step` 时设计的）**同一个实验**，before 和 after 各跑一次。before 用 `<节>-start` 的代码，可以用 `git worktree add` 开一个临时目录来跑，跑完删掉。
+- 用文档第 1 节（或者 `start-step` 时设计的）**同一个实验**，before 和 after 各跑一次。before 用这一节开始前的代码（`<名字>-main`，也就是 `learn/<节>` 的 merge base），可以用 `git worktree add` 开一个临时目录来跑，跑完删掉。
 - 把两组数字并排给出来：现象消失了吗？
 - **数字达标还不够**。要请学习者用一两句话解释：为什么这组数字说明问题被解决了。解释不出来，就回到分析环节重新讲。
 - 机器上没有这一步要求的硬件时，明确说明哪些项目没法在本机验收。
@@ -37,4 +37,5 @@ pytest tests -x -q          # 前面各节的测试也要一起跑
 全部通过后，建议下一步：
 
 1. 用 `compare-step <节>` 和参考实现、DeepInfer 做对照
-2. commit，push 到学习者自己的 fork，提 PR：`learn/<节>` → 学习者 fork 的 `main`
+2. commit，push 到学习者自己的 fork，提 PR：`learn/<节>` → 学习者 fork 的 `<名字>-main`；合并后在 `<名字>-main` 上打 `<节>-done` tag
+3. 改 `LEARNERS.md` 里自己那一行的进度，PR 到上游 `main`（标题 `learners: <名字> at <节>`）

@@ -5,20 +5,23 @@ description: 开始 nanovllm2deepinfer 路线中的某一节（如 1.1、2.3、4
 
 # start-step
 
-参数：节号（如 `2.3`），例如 `2.2`。没给编号时，读 `doc/README.md` 的进度和学习者当前所在的分支，推断下一步，并向学习者确认。
+参数：节号（如 `2.3`），例如 `2.2`。没给编号时，读学习者的进度分支 `<名字>-main` 上已经有哪些 `tests/test_X_Y.py`，推断下一步，并向学习者确认。
 
 ## 1. 准备环境
 
+学习者的进度分支是 `<名字>-main`（维护者的是 `kyrie-main`）。这一节从它上面切出来：
+
 ```bash
 git status --short                       # 有未提交的改动就先停下，问学习者怎么处理
-git fetch --tags
-git checkout <节>-start -b learn/<节>
-git checkout main -- doc AGENTS.md CLAUDE.md .claude   # 文档和 skill 始终用最新版
+git checkout <名字>-main
+git fetch upstream && git merge upstream/main     # 文档和 skill 始终用最新版；main 上没有实现，不会冲突
+git checkout -b learn/<节>
 git submodule update --init reference/DeepInfer
 ```
 
-- 如果 `<节>-start` 这个 tag 不存在（说明这一步的参考实现还没发布），就从学习者当前的进度往下做，并说明这一点。
-- 如果 `reference/DeepInfer` 是空的，运行 `bash scripts/setup_reference.sh`。
+- 还没有 `<名字>-main` 的（第一次用）：`git checkout -b <名字>-main main && git push -u origin <名字>-main`，再切 `learn/<节>`。
+- 上一节还没做完就想跳到这一节：`git fetch upstream --tags && git checkout <上一节>-done -- nanovllm tests`，把维护者的实现拿过来当起点，并说明这一点。tag 不存在就只能从当前进度往下做。
+- 如果 `reference/DeepInfer` 是空的或没有 `upstream`，运行 `bash scripts/setup_reference.sh`。
 
 ## 2. 读材料
 

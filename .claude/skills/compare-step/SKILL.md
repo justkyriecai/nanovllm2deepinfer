@@ -9,9 +9,14 @@ description: 把学习者在 nanovllm2deepinfer 某一节的实现和参考实�
 
 ## 1. 和参考实现对比
 
+参考实现是维护者 `kyrie-main` 上的 `<节>-done` tag，在上游：
+
 ```bash
+git fetch upstream --tags
 git diff <节>-done -- nanovllm/       # 学习者的实现 vs 参考实现
 ```
+
+维护者还没做到这一节（tag 不存在）时，看 `LEARNERS.md` 里有没有走在前面的人，拿他们 fork 里的分支来比；都没有就跳过这一步，只和 DeepInfer 比。
 
 把差异分成三类，一类一类讲：
 

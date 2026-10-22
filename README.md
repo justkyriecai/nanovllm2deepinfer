@@ -20,7 +20,7 @@
   <a href="AGENTS.md"><img src="https://img.shields.io/badge/agent-ready-d97757?style=flat-square&logo=anthropic&logoColor=white" alt="agent ready"></a>
 </p>
 
-> **状态**：第 1–5 章文档完成（34/34 节）；第 6 章（系统层）可选，未写。参考实现由学习者和维护者逐节验证后打 `<节>-done` tag。进度见 [doc/README.md](doc/README.md#8-进度)。
+> **状态**：第 1–5 章文档完成（34/34 节）；第 6 章（系统层）可选，未写。`main` 只有文档和起点代码；维护者的实现进度在 [`kyrie-main`](https://github.com/justkyriecai/nanovllm2deepinfer/tree/kyrie-main)，一起学的人和各自的进度见 [LEARNERS.md](LEARNERS.md)。
 
 ## 关于
 
@@ -71,10 +71,22 @@
 
 ```bash
 git clone https://github.com/<你>/nanovllm2deepinfer.git && cd nanovllm2deepinfer   # 先 fork
-bash scripts/setup_reference.sh      # 拉取 reference/ 下的 DeepInfer（含 vendor 子模块）和资料清单
+bash scripts/setup_reference.sh      # 加 upstream；拉取 reference/ 下的 DeepInfer（含 vendor 子模块）和资料清单
+git checkout -b <你>-main main       # 你的进度分支，从 main 切出来
+git push -u origin <你>-main
 ```
 
 然后在仓库根目录打开你的 agent，说"开始 1.1"。Claude Code 里也可以直接 `/start-step 1.1`。
+
+### 分支约定
+
+| 分支 | 在哪 | 放什么 |
+|---|---|---|
+| `main` | 本仓库 | 公开的原始版本：文档、路线、skill、nano-vllm 的起点代码。**永远不含任何一节的实现** |
+| `kyrie-main` | 本仓库 | 维护者的学习进展。每节做完合进来并打 `<节>-done` tag，可以当参考答案 |
+| `<你>-main` | 你的 fork | 你的学习进展。从 `main` 切出来，每节的 `learn/<节>` 合回这里 |
+
+开坑之后在 [LEARNERS.md](LEARNERS.md) 加一行，PR 到本仓库的 `main`，让大家知道你在做。进度变了就改那一行。
 
 每一节的流程：
 
@@ -86,7 +98,7 @@ bash scripts/setup_reference.sh      # 拉取 reference/ 下的 DeepInfer（含 
 | 验收 | 解释数字为什么说明问题解决了 | `/check-step`：重跑同一个实验 + 回归测试 |
 | 对照 | 读 diff | `/compare-step`：和参考实现、DeepInfer 对比，收一张卡片 |
 
-每一节有起止 tag（`2.3-start` / `2.3-done`），`2.3-start` 就是 2.2 的参考答案。卡住了或想跳过，直接从下一节的 tag 开始。做完在**你自己的 fork** 里提 PR（`learn/2.3` → `main`）当存档，不要提到本仓库。
+每一节从你的 `<你>-main` 切出 `learn/2.3`，做完在**你自己的 fork** 里提 PR（`learn/2.3` → `<你>-main`）当存档，不要提到本仓库的 `main`。卡住了或想跳过：`git fetch upstream --tags`，把 `kyrie-main` 上 `2.3-done` tag 的 `nanovllm/` 和 `tests/` 拿过来当下一节的起点。
 
 ### 项目结构
 
@@ -102,6 +114,7 @@ reference/
   DeepInfer/              DeepInfer 源码（submodule，固定版本），阅读和做实验用
   gpu-perf-engineering-resources/   理论资料清单（submodule）
 AGENTS.md                 给 agent 的教学规则；CLAUDE.md 指向它
+LEARNERS.md               一起学习的人和各自的进度分支
 .claude/skills/           start-step / check-step / compare-step / learn-codebase
 ```
 
@@ -119,16 +132,19 @@ AGENTS.md                 给 agent 的教学规则；CLAUDE.md 指向它
 **一定要用 agent 吗？**
 不一定。每一节的文档本身就是完整教程，可以自己读、自己做。agent 只是让"先发现、后解决"这个过程有人陪着走。
 
-**参考答案就在 main 上，怎么防止自己偷看？**
-靠自觉。`start-step` 会把你 checkout 到 `<节>-start`，那里没有这一节的答案。
+**参考答案在哪？怎么防止自己偷看？**
+`main` 上没有任何实现。参考答案在 `kyrie-main` 的 `<节>-done` tag 和 [LEARNERS.md](LEARNERS.md) 里走在前面的人的分支上，`start-step` 不会碰它们，要看得自己 fetch。靠自觉。
 
 **我可以给本仓库提 PR 吗？**
-欢迎，见下面。作业 PR 请提到你自己的 fork。
+欢迎，见下面。实现代码请留在你自己 fork 的 `<你>-main`，不要提到本仓库的 `main`。
 
 ## 贡献
 
-- 文档错误、行号失效、实验跑不出文档里的现象：直接开 issue 或 PR
-- 想给某一节写更好的实验或测试：开 issue 说一下思路再动手
+本仓库的 `main` 收三类东西：
+
+- **登记进度**：在 [LEARNERS.md](LEARNERS.md) 加或改自己那一行，直接 PR。开坑就来登记
+- **文档问题**：错别字、行号失效、实验跑不出文档里的现象、某一节按文档做不出来：直接开 issue 或 PR。做不出来的，issue 里写清楚卡在哪、你试了什么，可能是文档漏了一步，也可能是路线本身要改
+- **整个项目的问题**：路线顺序、节的划分、硬件要求、对 DeepInfer 的理解有偏差：开 issue 讨论。想给某一节写更好的实验或测试也先开 issue 说思路再动手
 - 升级 `reference/DeepInfer` 的 pin 要单独 PR，并同步检查 `doc/` 里所有引用的行号
 
 ## 致谢
