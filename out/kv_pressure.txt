@@ -1,0 +1,23 @@
+== kv_pressure ==
+requests=512  output_tokens=458266  throughput=1593.3 tok/s
+TTFT ms: mean=93137.43  p50=87672.18  p99=235456.94  max=235673.42
+TBT  ms: mean=94.62  p50=77.92  p99=149.49  max=76979.16
+preemptions=451  preempted_requests=266
+-- prefill: 318 steps, gpu busy 97.6%
+   wall             mean=74.95  p50=62.83  p99=424.01  max=429.96
+   cpu_schedule     mean=0.20  p50=0.18  p99=0.54  max=0.82
+   cpu_prepare      mean=1.32  p50=1.10  p99=5.71  max=6.49
+   cpu_launch       mean=60.20  p50=59.84  p99=67.16  max=80.55
+   cpu_sample_wait  mean=13.00  p50=1.44  p99=356.71  max=361.29
+   cpu_postprocess  mean=0.17  p50=0.14  p99=0.92  max=1.04
+   gpu_forward      mean=72.95  p50=61.18  p99=416.18  max=422.22
+   gpu_sample       mean=0.17  p50=0.16  p99=0.31  max=0.35
+-- decode: 3708 steps, gpu busy 98.0%
+   wall             mean=71.06  p50=77.65  p99=79.65  max=81.06
+   cpu_schedule     mean=0.14  p50=0.14  p99=0.26  max=0.55
+   cpu_prepare      mean=0.85  p50=0.87  p99=1.21  max=2.33
+   cpu_launch       mean=0.60  p50=0.59  p99=0.86  max=1.88
+   cpu_sample_wait  mean=69.17  p50=75.64  p99=77.66  max=78.54
+   cpu_postprocess  mean=0.24  p50=0.25  p99=0.44  max=0.76
+   gpu_forward      mean=68.95  p50=75.28  p99=77.55  max=78.39
+   gpu_sample       mean=0.69  p50=0.75  p99=1.05  max=1.13
