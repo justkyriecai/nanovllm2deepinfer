@@ -10,6 +10,7 @@ import argparse
 import os
 from random import Random
 
+from bench.run import warmup
 from bench.workloads import SCENARIOS
 
 
@@ -24,11 +25,12 @@ def main():
     from torch.profiler import ProfilerActivity, profile, record_function
     from nanovllm import LLM, SamplingParams
     llm = LLM(os.path.expanduser(args.model), enforce_eager=False, max_model_len=4096)
-    llm.generate(["warmup"], SamplingParams(max_tokens=16), use_tqdm=False)
+    requests = SCENARIOS[args.scenario](0)
+    warmup(llm, requests)
 
     # every request arrives at once, so the first steps are prefill and decode follows
     rng = Random(0)
-    for r in SCENARIOS[args.scenario](0):
+    for r in requests:
         prompt = [rng.randint(0, 10000) for _ in range(r.prompt_len)]
         llm.add_request(prompt, SamplingParams(temperature=r.temperature, ignore_eos=True, max_tokens=r.max_tokens))
 
