@@ -40,11 +40,11 @@ P3 是整条路线的期末考试：DeepInfer 自己的回归测试就是我们�
 
 每一节的格式：**现象**（怎么发现）→ 本质 → DeepInfer 的解法（`reference/DeepInfer/` 下的位置，`csrc/engine/`、`deepinfer/worker/`、`deepinfer/model_executor/` 等前缀省略）→ 验收。
 
-### 第 1 章：地基（任意 GPU）
+### 第 1 章：地基（任意 GPU，Modal 的 L4 即可）
 
 | 步 | 现象 | 本质 | 做什么 | 验收 |
 |---|---|---|---|---|
-| **0** | nano-vllm 只打印一个总吞吐；改了模型代码也不知道对不对 | 看不见就发现不了问题；判不了对错就不敢改 | 观测：固定负载场景（稳态 decode、长短混合、KV 高压、高并发小请求）、TTFT / TBT 分布、每步耗时拆分、调度决策 trace 导出、nsys 脚本、MFU 估算（对照 `flops_estimator.hpp`）。正确性：按 seed 固定采样，PPL / KL 对 HF 参考实现回归（对照 `tests/models/test_kl.py` 和 `offline_decode_ppl.json` 的做法） | 基线可复现；改一行模型代码能被 KL 测试抓住 |
+| **1.1** 观测与正确性 | nano-vllm 只打印一个总吞吐；改了模型代码也不知道对不对 | 看不见就发现不了问题；判不了对错就不敢改 | 观测：固定负载场景（稳态 decode、长短混合、KV 高压、高并发小请求）、TTFT / TBT 分布、每步耗时拆分（`perf_counter` + CUDA event，对照 `deepinfer/timer.py`）、调度决策 trace、kernel 级时间线（`torch.profiler` + Perfetto）。正确性：HF 当裁判的 `greedy_match` + `nll` 黄金文件，按均值带容差（DeepInfer 的 `offline_decode_ppl.json` 要求逐位相等，要等 2.12 的 batch-invariant 才做得到） | 四个场景的报告可复现；改一行 attention 能被黄金文件抓住 |
 
 ### 第 2 章：引擎控制面（1×H100，Qwen3-8B；CPU 开销实验用 Qwen3-0.6B 放大）
 
@@ -167,13 +167,15 @@ DeepInfer 开源版只留了钩子，这部分只能照官方文档做简化版�
 
 | 章 | 硬件 | 节数 | 预计时间 |
 |---|---|---|---|
-| 1 + 2 | 1×H100 | 13 | 60–90 h |
+| 1 + 2 | 1×L4（1.1–2.4）→ 1×H100 | 13 | 60–90 h |
 | 3 | 1×H100 | 3 | 15–25 h |
 | 4 | 1×B200 | 11 | 50–80 h |
 | 5 | 8×H100，最后一节 8×B200 | 7 | 40–60 h |
 | 6 | 不定 | 5 | 可选 |
 
-合计 34 节（不含第 6 章），约 170–260 小时。每一步加上理论大约 3–8 小时。GPU 价格开工前查 Runpod；5.7 要一次性集中几天做。
+合计 34 节（不含第 6 章），约 170–260 小时。每一步加上理论大约 3–8 小时。
+
+卡默认在 Modal 上租（`scripts/modal_run.py`）：按秒计费，跑完容器自动释放，每次运行有 20 分钟硬上限。L4 $0.80/h、H100 $3.95/h，1.1 整节不到 $3，Starter 的 $30 免费额度够做完第 1 章和第 2 章的大半。5.7 要一次性集中几天、8 卡独占，再考虑 Runpod 之类的整机租用。nsys 还没进 Modal 镜像，第一次看时间线用 `bench/timeline.py`（`torch.profiler`）加 Perfetto 就够；需要 nsys 的节（2.5、2.7）开工前把它装进镜像。
 
 两个还没验证的前提：(1) 从 V4.1-Flash 的 safetensors 只读前几层权重、让 DeepInfer 也只跑前几层做对拍是否可行，进入第 4 章前确认，不行就用随机权重加小配置；(2) `bf16_mega_moe` 是否支持 Hopper，影响 5.2 在 H100 上能做到哪一步。
 

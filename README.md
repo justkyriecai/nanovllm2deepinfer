@@ -47,7 +47,7 @@
 - **PyTorch**：知道 tensor、stream、CUDA graph 大概是什么；写过模型前向更好
 - **推理基础**：读过 vLLM 论文或 nano-vllm 的代码。没读过也行，第 1 章会补
 - **C++**（第 2 章后半起）：能看懂并改写几百行 C++；会用 pybind11 更好
-- **硬件**：第 1–3 章一张 H100；第 4 章一张 B200；第 5 章 8×H100，最后一节 8×B200。没有卡怎么办见 FAQ
+- **硬件**：不用自己有卡。实验默认在 [Modal](https://modal.com) 上跑（`scripts/modal_run.py`，按秒计费，跑完自动释放）：第 1–2 章一张 L4 就够，Starter 计划每月 $30 免费额度能做完第 1 章和第 2 章的大半；第 3 章 H100；第 4 章 B200；第 5 章 8×H100，最后一节 8×B200。详见 FAQ
 - **一个 agent**：Claude Code、Codex、Cursor 之类。本仓库的教学方式是 agent 当导师、你写代码
 
 ## 路线
@@ -74,9 +74,12 @@ git clone https://github.com/<你>/nanovllm2deepinfer.git && cd nanovllm2deepinf
 bash scripts/setup_reference.sh      # 加 upstream；拉取 reference/ 下的 DeepInfer（含 vendor 子模块）和资料清单
 git checkout -b <你>-main main       # 你的进度分支，从 main 切出来
 git push -u origin <你>-main
+uv tool install modal && modal setup   # 没有本地 GPU 时：登录 Modal，然后在 Usage & Billing 把 budget 设成 $30、spend limit 设成 $0
 ```
 
 然后在仓库根目录打开你的 agent，说"开始 1.1"。Claude Code 里也可以直接 `/start-step 1.1`。
+
+跑实验的命令统一是 `modal run scripts/modal_run.py --cmd "python bench.py"`：仓库运行时挂进 GPU 容器，本地改完下一次直接生效；模型和 `out/` 下的产物存在 Modal volume 里，一条命令拉回本地（见文件头）。本地有卡的人直接 `python bench.py`。
 
 ### 分支约定
 
@@ -121,7 +124,7 @@ LEARNERS.md               一起学习的人和各自的进度分支
 ## FAQ
 
 **没有 GPU 能学吗？**
-第 1 章和第 2 章前半（2.1–2.4）的调度逻辑可以在 CPU 上跑测试，但"发现问题"那一环要看真实的 TBT 和 nsys，没有卡就只能读文档和卡片。建议至少租一张 H100 做第 2 章，这是全路线性价比最高的部分。
+能，而且这是默认路径。实验在 Modal 上跑：一张 L4 $0.80/h，1.1 整节花不到 $3，Starter 计划每月 $30 免费额度够做完第 1 章和第 2 章的大半；第 2 章后半换 H100（$3.95/h）。每次运行有 20 分钟硬上限，不存在忘了关机。需要连续独占机器几天的（5.7）再考虑 Runpod 之类。纯 CPU 能做的只有各节测试里不碰 GPU 的部分，"发现问题"那一环要看真实的 TBT 和时间线，省不掉。
 
 **没有 B200 呢？**
 第 1–3 章和 5.1–5.6 都在 H100 上。第 4 章和 5.7 需要 B200，因为 DeepInfer 只支持 SM100，对拍必须在它能跑的卡上做。可以先做完其余部分，B200 集中租几天。
