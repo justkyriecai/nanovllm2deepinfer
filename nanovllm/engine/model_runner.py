@@ -1,6 +1,7 @@
 import pickle
 import torch
 import torch.distributed as dist
+from time import perf_counter
 from multiprocessing.synchronize import Event
 from multiprocessing.shared_memory import SharedMemory
 
@@ -31,6 +32,7 @@ class ModelRunner:
         self.model = Qwen3ForCausalLM(hf_config)
         load_model(self.model, config.model)
         self.sampler = Sampler()
+        self.cuda_events = [torch.cuda.Event(enable_timing=True) for _ in range(3)]
         self.warmup_model()
         self.allocate_kv_cache()
         if not self.enforce_eager:
@@ -212,10 +214,29 @@ class ModelRunner:
             return self.model.compute_logits(graph_vars["outputs"][:bs])
 
     def run(self, seqs: list[Sequence], is_prefill: bool) -> list[int]:
+        t0 = perf_counter()
         input_ids, positions = self.prepare_prefill(seqs) if is_prefill else self.prepare_decode(seqs)
         temperatures = self.prepare_sample(seqs) if self.rank == 0 else None
+        ev_forward, ev_sample, ev_end = self.cuda_events
+        t1 = perf_counter()
+        ev_forward.record()
         logits = self.run_model(input_ids, positions, is_prefill)
-        token_ids = self.sampler(logits, temperatures).tolist() if self.rank == 0 else None
+        ev_sample.record()
+        t2 = perf_counter()
+        token_ids = None
+
+        if self.rank == 0:
+            sampled = self.sampler(logits, temperatures)
+            ev_end.record()
+            token_ids = sampled.tolist()
+            t3 = perf_counter()
+            self.last_timing = dict(
+                cpu_prepare = t1 - t0,
+                cpu_launch = t2 - t1,
+                cpu_sample_wait = t3 - t2,
+                gpu_forward = ev_forward.elapsed_time(ev_sample) / 1000,
+                gpu_sample = ev_sample.elapsed_time(ev_end) / 1000
+            )
         reset_context()
         return token_ids
 
