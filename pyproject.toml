@@ -28,6 +28,7 @@ include = ["nanovllm*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["."]
 norecursedirs = ["reference", ".git"]
 
 [tool.ruff]
