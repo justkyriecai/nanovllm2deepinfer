@@ -10,6 +10,7 @@ from nanovllm.sampling_params import SamplingParams
 from nanovllm.engine.sequence import Sequence
 from nanovllm.engine.scheduler import Scheduler
 from nanovllm.engine.model_runner import ModelRunner
+from nanovllm.engine.stats import StepRecord, RequestRecord
 
 
 class LLMEngine:
@@ -32,6 +33,9 @@ class LLMEngine:
         self.tokenizer = AutoTokenizer.from_pretrained(config.model, use_fast=True)
         config.eos = self.tokenizer.eos_token_id
         self.scheduler = Scheduler(config)
+        self.step_records: list[StepRecord] = []
+        self.request_records: list[RequestRecord] = []
+        self.trace = None
         atexit.register(self.exit)
 
     def exit(self):
@@ -47,10 +51,40 @@ class LLMEngine:
         self.scheduler.add(seq)
 
     def step(self):
+        t0 = perf_counter()
         seqs, is_prefill = self.scheduler.schedule()
+        t1 = perf_counter()
         num_tokens = sum(seq.num_scheduled_tokens for seq in seqs) if is_prefill else -len(seqs)
         token_ids = self.model_runner.call("run", seqs, is_prefill)
+        t2 = perf_counter()
         self.scheduler.postprocess(seqs, token_ids, is_prefill)
+        t3 = perf_counter()
+        finished, self.scheduler.finished = self.scheduler.finished, []
+        preempted, self.scheduler.preempted = self.scheduler.preempted, []
+        record = StepRecord(
+            is_prefill=is_prefill,
+            num_seqs=len(seqs),
+            num_tokens=abs(num_tokens),
+            wall=t3 - t0,
+            cpu_schedule=t1 - t0,
+            cpu_postprocess=t3 - t2,
+            seq_ids=[seq.seq_id for seq in seqs],
+            finished=[seq.seq_id for seq in finished],
+            preempted=preempted,
+            **self.model_runner.last_timing,
+        )
+        self.step_records.append(record)
+        for seq in finished:
+            self.request_records.append(RequestRecord(
+                seq_id=seq.seq_id,
+                num_prompt_tokens=seq.num_prompt_tokens,
+                num_output_tokens=seq.num_completion_tokens,
+                arrival_time=seq.arrival_time,
+                token_times=seq.token_times,
+                num_preemptions=seq.num_preemptions,
+            ))
+        if self.trace is not None:
+            self.trace(record)
         outputs = [(seq.seq_id, seq.completion_token_ids) for seq in seqs if seq.is_finished]
         return outputs, num_tokens
 
