@@ -224,18 +224,17 @@ class ModelRunner:
         ev_sample.record()
         t2 = perf_counter()
         token_ids = None
-
         if self.rank == 0:
             sampled = self.sampler(logits, temperatures)
             ev_end.record()
             token_ids = sampled.tolist()
             t3 = perf_counter()
             self.last_timing = dict(
-                cpu_prepare = t1 - t0,
-                cpu_launch = t2 - t1,
-                cpu_sample_wait = t3 - t2,
-                gpu_forward = ev_forward.elapsed_time(ev_sample) / 1000,
-                gpu_sample = ev_sample.elapsed_time(ev_end) / 1000
+                cpu_prepare=t1 - t0,
+                cpu_launch=t2 - t1,
+                cpu_sample_wait=t3 - t2,
+                gpu_forward=ev_forward.elapsed_time(ev_sample) / 1000,
+                gpu_sample=ev_sample.elapsed_time(ev_end) / 1000,
             )
         reset_context()
         return token_ids

@@ -65,9 +65,9 @@ class LLMEngine:
             is_prefill=is_prefill,
             num_seqs=len(seqs),
             num_tokens=abs(num_tokens),
-            wall = t3-t0,
-            cpu_schedule=t1-t0,
-            cpu_postprocess=t3-t2,
+            wall=t3 - t0,
+            cpu_schedule=t1 - t0,
+            cpu_postprocess=t3 - t2,
             seq_ids=[seq.seq_id for seq in seqs],
             finished=[seq.seq_id for seq in finished],
             preempted=preempted,
@@ -76,7 +76,7 @@ class LLMEngine:
         self.step_records.append(record)
         for seq in finished:
             self.request_records.append(RequestRecord(
-                seq_id = seq.seq_id,
+                seq_id=seq.seq_id,
                 num_prompt_tokens=seq.num_prompt_tokens,
                 num_output_tokens=seq.num_completion_tokens,
                 arrival_time=seq.arrival_time,
