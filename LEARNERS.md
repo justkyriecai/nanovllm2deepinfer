@@ -4,7 +4,7 @@
 
 | 谁 | 进度分支 | 做到哪了 | 硬件 | 开坑 | 一句话 |
 |---|---|---|---|---|---|
-| [kyrie](https://github.com/justkyriecai) | [`kyrie-main`](https://github.com/justkyriecai/nanovllm2deepinfer/tree/kyrie-main) | 还没开始 | 租 Runpod | 2026-10 | 路线写完了，准备从 1.1 开工 |
+| [kyrie](https://github.com/justkyriecai) | [`kyrie-main`](https://github.com/justkyriecai/nanovllm2deepinfer/tree/kyrie-main) | 1.1 做完（tag `1.1-done`） | Modal L4 | 2026-10 | 1.1 用 Modal 的 L4 + Qwen3-0.6B 做完，$30 免费额度花了不到 $5 |
 
 ## 怎么登记
 
