@@ -47,7 +47,7 @@ def summarize_requests(requests, duration: float) -> dict:
 
 
 def format_report(scenario: str, steps: dict, requests: dict) -> str:
-    ms = lambda d: "  ".join(f"{k}={v * 1e3:.2f}" for k, v in d.items())
+    ms = lambda d: "  ".join(f"{k}={v * 1e3:.2f}" for k, v in d.items()) or "-"  # empty when no request finished
     lines = [f"== {scenario} ==",
              f"requests={requests['requests']}  output_tokens={requests['output_tokens']}  "
              f"throughput={requests['throughput']:.1f} tok/s",
