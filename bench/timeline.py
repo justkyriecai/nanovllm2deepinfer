@@ -10,21 +10,20 @@ import argparse
 import os
 from random import Random
 
-from bench.run import warmup
+from bench.run import add_engine_args, make_llm, warmup
 from bench.workloads import SCENARIOS
 
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--model", default="~/huggingface/Qwen3-0.6B")
-    p.add_argument("--scenario", choices=list(SCENARIOS), default="steady_decode")
+    add_engine_args(p)
     p.add_argument("--steps", type=int, default=3, help="steps captured per phase")
     args = p.parse_args()
 
     import torch
     from torch.profiler import ProfilerActivity, profile, record_function
-    from nanovllm import LLM, SamplingParams
-    llm = LLM(os.path.expanduser(args.model), enforce_eager=False, max_model_len=4096)
+    from nanovllm import SamplingParams
+    llm = make_llm(args)
     requests = SCENARIOS[args.scenario](0)
     warmup(llm, requests)
 
