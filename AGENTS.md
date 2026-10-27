@@ -87,7 +87,8 @@
 
 - 本机有 GPU 就直接跑。没有的话用 `scripts/modal_run.py`：仓库运行时挂进容器，本地改完下一次直接生效；模型和 `out/` 下的产物存在 Modal volume 里，拉回本地的命令在文件头。1.1 和 2.1–2.4 在 L4 上就能做；2.5 起要 H100（L4 一步 60 多毫秒，会把 CPU 开销遮住），加 `GPU=H100`；8 卡写 `GPU=H100:8`。每次运行默认 20 分钟后被杀掉，真的要跑更久时加 `TIMEOUT_MIN=60`。Starter 计划的 $30 免费额度大约够到 2.5，各章费用见 `doc/README.md` §7。
 - 第一次用之前让学习者在 Modal 的 Usage & Billing 页面把 budget 设成 $30、spend limit 设成 $0，再开始跑。
-- 实验的产物（报告、trace、golden）都写到 `out/`，它不进 git。
+- 实验的产物（报告、trace、golden、`.nsys-rep`）都写到 `out/`，它不进 git。
+- 看 kernel 级时间线：第一次用 `python -m bench.timeline` + Perfetto；从 2.5 起用 nsys，镜像里已装好，标准命令在 1.1 文档"看时间线"一节（在 Modal 上必须带 `--sample=none --cpuctxsw=none`，录 `bench.run` 时加 `--capture-range=cudaProfilerApi` 只录测量段）。
 - 每个实验跑之前先让学习者预测；跑完的数字连同硬件一起记进文档或卡片。文档里的预期数字是按某一种硬件写的，换卡比例会变，这本身就是要讲的内容。
 
 ## 某一步的文档还没写时

@@ -22,7 +22,7 @@ description: 验收 nanovllm2deepinfer 某一节的实现：用发现问题时�
 
 1. 这一节的问题对应报告里的哪几个数？先让他指出来。
 2. 有没有自相矛盾的数？比如 `cpu_launch ≈ gpu_forward` 而 `cpu_sample_wait ≈ 0`（CPU 发射是瓶颈，但 `gpu_busy` 却显示很高）；`wall max` 远大于 p99（有一次性的尖峰，通常是编译或懒初始化）。矛盾的数是最值得追的。
-3. 追不下去就录时间线：`python -m bench.timeline --scenario <场景>`，把 `out/<场景>_{prefill,decode}.json` 拖进 https://ui.perfetto.dev。第一次看要带着走（1.1 文档"验收"一节有完整的导读路线）：认轨道，搜 `prefill step 1` 按 F 聚焦，W/S 缩放，看 CPU 那排的发射段和等待段谁长、GPU 那排的 kernel 之间有没有空隙、箭头是不是越来越斜。
+3. 追不下去就录时间线：`python -m bench.timeline --scenario <场景>`，把 `out/<场景>_{prefill,decode}.json` 拖进 https://ui.perfetto.dev。第一次看要带着走（1.1 文档"验收"一节有完整的导读路线）：认轨道，搜 `prefill step 1` 按 F 聚焦，W/S 缩放，看 CPU 那排的发射段和等待段谁长、GPU 那排的 kernel 之间有没有空隙、箭头是不是越来越斜。从 2.5 起换成 nsys（标准命令在 1.1 文档"看时间线"），`nsys stats --report nvtx_sum,cuda_gpu_kern_sum` 先出表，再决定要不要开图形界面。
 4. 图上看到的和报告里的数字对起来：图负责看见，数字负责统计。
 
 ## 3. 回归

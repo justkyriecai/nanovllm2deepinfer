@@ -3,6 +3,11 @@
     modal run scripts/modal_run.py --cmd "python bench.py"
     GPU=H100 modal run scripts/modal_run.py --cmd "python bench.py"
     GPU=H100:8 TIMEOUT_MIN=60 modal run scripts/modal_run.py --cmd "..."
+    modal run scripts/modal_run.py --model deepseek-ai/DeepSeek-V2-Lite --cmd "..."
+
+`--model` is a Hugging Face repo id; it is downloaded once into ~/huggingface/<name>
+(e.g. ~/huggingface/DeepSeek-V2-Lite), which is the path the bench commands take.
+nsys is in the image: `nsys profile ... python -m bench.run ...` works as is.
 
 Each run is killed after TIMEOUT_MIN minutes (default 20) so a hung job can't
 burn credits; raise it only for runs that really are long.
@@ -30,7 +35,12 @@ TIMEOUT_MIN = int(os.environ.get("TIMEOUT_MIN", "20"))
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
-    .apt_install("build-essential")  # triton compiles its launcher with gcc
+    .apt_install("build-essential", "wget")  # triton compiles its launcher with gcc
+    .run_commands(  # Nsight Systems CLI from NVIDIA's CUDA repo, for kernel-level timelines
+        "wget -qO /tmp/cuda-keyring.deb https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb",
+        "dpkg -i /tmp/cuda-keyring.deb && apt-get update && apt-get install -y --no-install-recommends nsight-systems-2026.3.2",
+        "ln -sf $(ls -d /opt/nvidia/nsight-systems/*/bin/nsys | head -1) /usr/local/bin/nsys",
+    )
     .pip_install("torch==2.6.0", "transformers>=4.51,<5", "xxhash", "huggingface_hub", "pytest")
     .pip_install(
         "https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/"
@@ -46,10 +56,11 @@ outputs = modal.Volume.from_name("nanovllm-out", create_if_missing=True)
 
 @app.function(gpu=GPU, volumes={MODELS: models, OUT: outputs}, timeout=TIMEOUT_MIN * 60)
 def run(cmd: str, model: str):
-    path = os.path.join(MODELS, model)
+    repo = model if "/" in model else f"Qwen/{model}"  # bare names are Qwen models, as before
+    path = os.path.join(MODELS, repo.split("/")[-1])
     if not os.path.exists(os.path.join(path, "config.json")):
         from huggingface_hub import snapshot_download
-        snapshot_download(f"Qwen/{model}", local_dir=path)
+        snapshot_download(repo, local_dir=path)
         models.commit()
     try:
         subprocess.run(cmd, shell=True, cwd=REPO, check=True)
@@ -60,6 +71,6 @@ def run(cmd: str, model: str):
 
 
 @app.local_entrypoint()
-def main(cmd: str = "python bench.py", model: str = "Qwen3-0.6B"):
+def main(cmd: str = "python bench.py", model: str = "Qwen/Qwen3-0.6B"):
     print(f"GPU={GPU}  timeout={TIMEOUT_MIN}min  cmd={cmd!r}")
     run.remote(cmd, model)
