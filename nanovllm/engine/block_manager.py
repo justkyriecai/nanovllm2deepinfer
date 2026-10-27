@@ -1,4 +1,5 @@
 from collections import deque
+from enum import Enum, auto
 import xxhash
 import numpy as np
 
@@ -21,6 +22,13 @@ class Block:
         self.ref_count = 1
         self.hash = -1
         self.token_ids = []
+
+
+class AllocStatus(Enum):
+    # DeepInfer csrc/engine/block_manager.hpp:128
+    OK = auto()      # fits now
+    LATER = auto()   # does not fit now, will once others finish
+    NEVER = auto()   # will not fit even into an empty cache
 
 
 class BlockManager:
@@ -55,7 +63,7 @@ class BlockManager:
         self.used_block_ids.remove(block_id)
         self.free_block_ids.append(block_id)
 
-    def can_allocate(self, seq: Sequence) -> int:
+    def can_allocate(self, seq: Sequence) -> tuple[AllocStatus, int]:
         h = -1
         num_cached_blocks = 0
         num_new_blocks = seq.num_blocks
@@ -68,9 +76,11 @@ class BlockManager:
             num_cached_blocks += 1
             if block_id in self.used_block_ids:
                 num_new_blocks -= 1
+        if seq.num_blocks >= len(self.blocks):
+            return AllocStatus.NEVER, 0
         if len(self.free_block_ids) < num_new_blocks:
-            return -1
-        return num_cached_blocks
+            return AllocStatus.LATER, 0
+        return AllocStatus.OK, num_cached_blocks
 
     def allocate(self, seq: Sequence, num_cached_blocks: int):
         assert not seq.block_table

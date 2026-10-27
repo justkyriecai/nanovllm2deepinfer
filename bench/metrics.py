@@ -40,7 +40,7 @@ def summarize_requests(requests, duration: float) -> dict:
         "requests": len(requests),
         "output_tokens": output_tokens,
         "throughput": output_tokens / duration,
-        "ttft": dist([r.ttft for r in requests]),
+        "ttft": dist([r.ttft for r in requests if r.token_times]),  # ignored / early-aborted ones never got a token
         "tbt": dist([t for r in requests for t in r.tbt]),
         "preempted_requests": sum(r.num_preemptions > 0 for r in requests),
     }

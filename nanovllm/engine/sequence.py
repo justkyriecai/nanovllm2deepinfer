@@ -1,15 +1,29 @@
 from copy import copy
-from enum import Enum, auto
+from enum import IntEnum, auto
 from itertools import count
 from time import perf_counter
 
 from nanovllm.sampling_params import SamplingParams
 
 
-class SequenceStatus(Enum):
+class SequenceStatus(IntEnum):
+    # DeepInfer csrc/engine/sequence.hpp:30. Order matters: every FINISHED_* comes after RUNNING.
     WAITING = auto()
     RUNNING = auto()
-    FINISHED = auto()
+    FINISHED_STOPPED = auto()
+    FINISHED_LENGTH_CAPPED = auto()
+    FINISHED_ABORTED = auto()
+    FINISHED_IGNORED = auto()
+    FINISHED_PREEMPTED = auto()
+
+
+FINISH_REASONS = {
+    SequenceStatus.FINISHED_STOPPED: "stop",
+    SequenceStatus.FINISHED_LENGTH_CAPPED: "length",
+    SequenceStatus.FINISHED_ABORTED: "abort",
+    SequenceStatus.FINISHED_IGNORED: "prompt_length_exceeded",
+    SequenceStatus.FINISHED_PREEMPTED: "insufficient_system_resource",
+}
 
 
 class Sequence:
@@ -34,6 +48,7 @@ class Sequence:
         self.arrival_time = perf_counter()
         self.token_times: list[float] = []
         self.num_preemptions = 0
+        self.total_inflight_tokens = 0
 
     def __len__(self):
         return self.num_tokens
@@ -43,7 +58,11 @@ class Sequence:
 
     @property
     def is_finished(self):
-        return self.status == SequenceStatus.FINISHED
+        return self.status >= SequenceStatus.FINISHED_STOPPED
+
+    @property
+    def finish_reason(self) -> str | None:
+        return FINISH_REASONS.get(self.status)
 
     @property
     def num_completion_tokens(self):
@@ -59,7 +78,7 @@ class Sequence:
 
     @property
     def num_blocks(self):
-        return (self.num_tokens + self.block_size - 1) // self.block_size
+        return (self.num_tokens + self.total_inflight_tokens + self.block_size - 1) // self.block_size
 
     @property
     def last_block_num_tokens(self):

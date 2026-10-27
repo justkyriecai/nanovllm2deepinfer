@@ -32,6 +32,7 @@ class RequestRecord:
     arrival_time: float
     token_times: list[float]
     num_preemptions: int
+    finish_reason: str | None = None
 
     @property
     def ttft(self) -> float:
