@@ -2,6 +2,10 @@
 
     modal run scripts/modal_run.py --cmd "python bench.py"
     GPU=H100 modal run scripts/modal_run.py --cmd "python bench.py"
+    GPU=H100:8 TIMEOUT_MIN=60 modal run scripts/modal_run.py --cmd "..."
+
+Each run is killed after TIMEOUT_MIN minutes (default 20) so a hung job can't
+burn credits; raise it only for runs that really are long.
 
 The repo is mounted at run time (not baked into the image), so local edits
 take effect on the next run without rebuilding. Models live in the Modal
@@ -22,7 +26,7 @@ REPO = "/root/repo"
 MODELS = "/root/huggingface"
 OUT = "/root/out"
 GPU = os.environ.get("GPU", "L4")
-TIMEOUT_MIN = 20  # hard cap per run, so a hung job can't burn credits
+TIMEOUT_MIN = int(os.environ.get("TIMEOUT_MIN", "20"))
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
