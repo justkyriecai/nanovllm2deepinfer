@@ -79,7 +79,7 @@ class Scheduler:
             if seq.num_scheduled_tokens < num_tokens:
                 break
         return scheduled_seqs
-    
+
     def _decode(self) -> list[Sequence]:
         scheduled_seqs = []
         while self.running and len(scheduled_seqs) < self.max_num_seqs:
