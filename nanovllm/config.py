@@ -16,6 +16,8 @@ class Config:
     eos: int = -1
     kvcache_block_size: int = 256
     num_kvcache_blocks: int = -1
+    prefill_attempt_interval: int = 70  # try prefill once every this many decode steps (scheduler.hpp:308)
+    prefill_watermark: float = 0.9      # and only while KV block usage is at most this (scheduler.hpp:80)
 
     def __post_init__(self):
         assert os.path.isdir(self.model)

@@ -10,7 +10,8 @@ from bench.workloads import SCENARIOS
 
 
 # engine knobs later sections turn; only the ones given on the command line override Config's defaults
-ENGINE_ARGS = {"max_num_seqs": int, "max_num_batched_tokens": int, "gpu_memory_utilization": float, "max_model_len": int}
+ENGINE_ARGS = {"max_num_seqs": int, "max_num_batched_tokens": int, "gpu_memory_utilization": float, "max_model_len": int,
+               "prefill_attempt_interval": int, "prefill_watermark": float}
 
 
 def drive(llm, requests, seed: int = 0, num_steps: int | None = None) -> float:
