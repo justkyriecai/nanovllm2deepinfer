@@ -88,6 +88,10 @@ class Sequence:
         assert 0 <= i < self.num_blocks
         return self.token_ids[i*self.block_size: (i+1)*self.block_size]
 
+    def reset_for_recompute(self):
+        """Back to an unprefilled prompt after preemption: its KV is gone, prompt + output so far are redone (sequence.hpp:223, :258)."""
+        raise NotImplementedError("TODO(2.3)")
+
     def append_token(self, token_id: int):
         self.token_ids.append(token_id)
         self.last_token = token_id

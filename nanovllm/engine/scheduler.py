@@ -18,8 +18,10 @@ class Scheduler:
         self.running: deque[Sequence] = deque()
         self.finished: list[Sequence] = []  # left the queues in a FINISHED_* state; blocks not yet freed
         self.preempted: list[int] = []
+        self.recomputed_tokens = 0  # num_tokens of the seqs preempted since the last step (KV thrown away); reset by LLMEngine.step
         self.prefill_attempt_interval = config.prefill_attempt_interval
         self.prefill_watermark = config.prefill_watermark
+        self.stop_preempted_request = config.stop_preempted_request
         self.decode_step = 0  # decode steps since the last prefill step (scheduler.hpp:677)
 
     def is_finished(self):
@@ -119,8 +121,9 @@ class Scheduler:
         return seqs, False
 
     def preempt(self, seq: Sequence):
-        seq.num_preemptions += 1
         self.preempted.append(seq.seq_id)
+        self.recomputed_tokens += seq.num_tokens
+        seq.num_preemptions += 1
         seq.status = SequenceStatus.WAITING
         seq.is_prefill = True
         self.block_manager.deallocate(seq)
