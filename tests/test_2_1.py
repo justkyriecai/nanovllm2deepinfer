@@ -35,7 +35,8 @@ def make_engine(num_blocks=8, max_model_len=4096, max_num_seqs=8, token=1, on_ru
     Sequence.block_size = BLOCK
     config = SimpleNamespace(max_num_seqs=max_num_seqs, max_num_batched_tokens=16384, max_model_len=max_model_len,
                              eos=EOS, kvcache_block_size=BLOCK, num_kvcache_blocks=num_blocks,
-                             prefill_attempt_interval=1, prefill_watermark=1.0)  # 2.2's knobs off: prefill whenever waiting
+                             prefill_attempt_interval=1, prefill_watermark=1.0,
+                             stop_preempted_request=False)  # 2.2's knobs off: prefill whenever waiting
     engine = LLMEngine.__new__(LLMEngine)  # skip loading a model
     engine.scheduler = Scheduler(config)
     engine.model_runner = FakeRunner(token, on_run)
