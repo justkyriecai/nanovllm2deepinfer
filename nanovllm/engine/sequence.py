@@ -90,7 +90,10 @@ class Sequence:
 
     def reset_for_recompute(self):
         """Back to an unprefilled prompt after preemption: its KV is gone, prompt + output so far are redone (sequence.hpp:223, :258)."""
-        raise NotImplementedError("TODO(2.3)")
+        self.num_cached_tokens = 0
+        self.num_scheduled_tokens = 0
+        self.is_prefill = True
+        self.total_inflight_tokens = 0
 
     def append_token(self, token_id: int):
         self.token_ids.append(token_id)
