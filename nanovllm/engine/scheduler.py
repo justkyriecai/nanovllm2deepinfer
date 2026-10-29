@@ -3,6 +3,7 @@ from collections import deque
 from nanovllm.config import Config
 from nanovllm.engine.sequence import Sequence, SequenceStatus
 from nanovllm.engine.block_manager import AllocStatus, BlockManager
+from nanovllm.sampling_params import SamplingParams
 
 
 class Scheduler:
@@ -16,8 +17,10 @@ class Scheduler:
         self.block_manager = BlockManager(config.num_kvcache_blocks, config.kvcache_block_size)
         self.waiting: deque[Sequence] = deque()
         self.running: deque[Sequence] = deque()
+        self.prompted: deque[Sequence] = deque()  # KV already computed (forked), waiting to enter running (scheduler.hpp:1125)
         self.finished: list[Sequence] = []  # left the queues in a FINISHED_* state; blocks not yet freed
         self.preempted: list[int] = []
+        self.clone_pairs: list[tuple[int, int]] = []  # (src, dst) KV blocks to copy before this step runs; taken by LLMEngine.step
         self.recomputed_tokens = 0  # num_tokens of the seqs preempted since the last step (KV thrown away); reset by LLMEngine.step
         self.prefill_attempt_interval = config.prefill_attempt_interval
         self.prefill_watermark = config.prefill_watermark
@@ -25,7 +28,7 @@ class Scheduler:
         self.decode_step = 0  # decode steps since the last prefill step (scheduler.hpp:677)
 
     def is_finished(self):
-        return not self.waiting and not self.running
+        return not self.waiting and not self.running and not self.prompted
 
     def add(self, seq: Sequence):
         if seq.num_prompt_tokens > self.max_model_len - 1:
@@ -35,7 +38,7 @@ class Scheduler:
     def abort(self, seq_ids: list[int]):
         """Only marks. Queues and blocks are cleaned up by the next schedule() / step() (scheduler.hpp:144)."""
         ids = set(seq_ids)
-        for seq in [*self.waiting, *self.running]:
+        for seq in [*self.waiting, *self.running, *self.prompted]:
             if seq.seq_id in ids and not seq.is_finished:
                 seq.status = SequenceStatus.FINISHED_ABORTED
 
@@ -104,7 +107,7 @@ class Scheduler:
         return scheduled
 
     def schedule(self) -> tuple[list[Sequence], bool]:
-        for queue in (self.running, self.waiting):
+        for queue in (self.running, self.waiting, self.prompted):
             self.finished += [seq for seq in queue if seq.is_finished]
             live = [seq for seq in queue if not seq.is_finished]
             queue.clear()
@@ -116,11 +119,44 @@ class Scheduler:
                 self.decode_step = 0
                 return seqs, True
 
+        self._admit_prompted()
         if not self.running:
             return [], True
         seqs = self._decode()
         self.decode_step += 1
         return seqs, False
+
+    def fork(self, parent: Sequence) -> Sequence:
+        """A child that shares parent's computed prompt KV, queued in prompted (scheduler.hpp:1061-1120)."""
+        child = Sequence(
+            parent.prompt_token_ids,
+            SamplingParams(
+                temperature=parent.temperature,
+                max_tokens=parent.max_tokens,
+                ignore_eos=parent.ignore_eos
+            )
+        )
+        child.arrival_time = parent.arrival_time
+        child.block_table = parent.block_table[:]
+        child.num_cached_tokens = min(parent.num_cached_tokens, child.num_tokens - 1)
+        self.block_manager.pin(child.block_table)
+        self.prompted.append(child)
+        return child
+
+    def _admit_prompted(self):
+        """prompted -> running; copy-on-write the last block of each forked seq (scheduler.hpp:595-619)."""
+        while self.prompted and len(self.running) < self.max_num_seqs:
+            seq = self.prompted[0]
+            if not self.block_manager.free_block_ids:
+                break
+            num_blocks = (seq.num_cached_tokens + self.block_size - 1) // self.block_size
+            src, dst = seq.block_table[num_blocks - 1], self.block_manager._allocate_block()
+            self.clone_pairs.append((src, dst))
+            self.block_manager.unpin([src] + seq.block_table[num_blocks:])
+            seq.block_table[num_blocks-1] = dst
+            del seq.block_table[num_blocks:]
+            seq.status = SequenceStatus.RUNNING
+            self.running.append(self.prompted.popleft())
 
     def preempt(self, seq: Sequence):
         self.preempted.append(seq.seq_id)
@@ -145,6 +181,9 @@ class Scheduler:
             if is_prefill and seq.num_cached_tokens < seq.num_tokens:
                 continue
             seq.append_token(token_id)
+            if is_prefill and seq.n > 1 and seq.num_completion_tokens == 1:
+                for _ in range(seq.n-1):
+                    self.fork(seq)
             if not seq.ignore_eos and token_id == self.eos:
                 seq.status = SequenceStatus.FINISHED_STOPPED
             elif seq.num_completion_tokens == seq.max_tokens or seq.num_tokens >= self.max_model_len:

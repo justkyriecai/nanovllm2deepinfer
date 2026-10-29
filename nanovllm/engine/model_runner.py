@@ -213,6 +213,11 @@ class ModelRunner:
             graph.replay()
             return self.model.compute_logits(graph_vars["outputs"][:bs])
 
+    def clone_blocks(self, pairs: list[tuple[int, int]]):
+        """kv_cache[..., dst] = kv_cache[..., src] for every layer, k and v (clone_and_zero_states_and_blocks, scheduler.hpp:1264)."""
+        src, dst = zip(*pairs)
+        self.kv_cache[:, :, list(dst)] = self.kv_cache[:, :, list(src)]
+
     def run(self, seqs: list[Sequence], is_prefill: bool) -> list[int]:
         t0 = perf_counter()
         input_ids, positions = self.prepare_prefill(seqs) if is_prefill else self.prepare_decode(seqs)

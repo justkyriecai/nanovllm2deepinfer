@@ -19,6 +19,7 @@ class StepRecord:
     finished: list[int] = field(default_factory=list)
     preempted: list[int] = field(default_factory=list)
     recomputed_tokens: int = 0  # sum of num_tokens of the seqs preempted this step: KV thrown away
+    num_used_blocks: int = 0    # KV blocks held after scheduling this step
 
     @property
     def gpu_busy(self) -> float:

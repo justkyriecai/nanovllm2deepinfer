@@ -32,6 +32,7 @@ def summarize_steps(steps) -> dict:
         }
     out["preemptions"] = sum(len(s.preempted) for s in steps)
     out["recomputed_tokens"] = sum(s.recomputed_tokens for s in steps)
+    out["peak_kv_blocks"] = max((s.num_used_blocks for s in steps), default=0)
     return out
 
 
@@ -55,7 +56,8 @@ def format_report(scenario: str, steps: dict, requests: dict) -> str:
              f"TTFT ms: {ms(requests['ttft'])}",
              f"TBT  ms: {ms(requests['tbt'])}",
              f"preemptions={steps['preemptions']}  preempted_requests={requests['preempted_requests']}  "
-             f"recomputed_tokens={steps['recomputed_tokens']} ({steps['recomputed_tokens'] / max(requests['output_tokens'], 1):.1%} of output)"]
+             f"recomputed_tokens={steps['recomputed_tokens']} ({steps['recomputed_tokens'] / max(requests['output_tokens'], 1):.1%} of output)",
+             f"peak_kv_blocks={steps['peak_kv_blocks']}"]
     for kind in ("prefill", "decode"):
         if kind not in steps:
             continue
