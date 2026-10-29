@@ -8,6 +8,8 @@ class Request:
     max_tokens: int
     arrival_step: int = 0
     temperature: float = 0.6
+    prompt_id: int | None = None  # requests with the same prompt_id get the same prompt tokens
+    n: int = 1                    # outputs per prompt (SamplingParams.n)
 
 
 def steady_decode(seed: int = 0) -> list[Request]:
@@ -36,4 +38,15 @@ def many_small(seed: int = 0) -> list[Request]:
     return [Request(rng.randint(16, 32), rng.randint(32, 64)) for _ in range(512)]
 
 
-SCENARIOS = {f.__name__: f for f in (steady_decode, mixed_long_short, kv_pressure, many_small)}
+def parallel_sampling(seed: int = 0) -> list[Request]:
+    """16 prompts of 2048 tokens, each asked for 4 different outputs: today that means 4 identical requests."""
+    return [Request(2048, 64, temperature=1.0, prompt_id=i) for i in range(16) for _ in range(4)]
+
+
+def parallel_sampling_fork(seed: int = 0) -> list[Request]:
+    """parallel_sampling with SamplingParams(n=4): 16 requests, 64 outputs."""
+    return [Request(2048, 64, temperature=1.0, n=4) for _ in range(16)]
+
+
+SCENARIOS = {f.__name__: f for f in (steady_decode, mixed_long_short, kv_pressure, many_small, parallel_sampling,
+                                     parallel_sampling_fork)}

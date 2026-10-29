@@ -44,6 +44,7 @@ class Sequence:
         self.temperature = sampling_params.temperature
         self.max_tokens = sampling_params.max_tokens
         self.ignore_eos = sampling_params.ignore_eos
+        self.n = sampling_params.n
 
         self.arrival_time = perf_counter()
         self.token_times: list[float] = []
@@ -87,6 +88,13 @@ class Sequence:
     def block(self, i):
         assert 0 <= i < self.num_blocks
         return self.token_ids[i*self.block_size: (i+1)*self.block_size]
+
+    def reset_for_recompute(self):
+        """Back to an unprefilled prompt after preemption: its KV is gone, prompt + output so far are redone (sequence.hpp:223, :258)."""
+        self.num_cached_tokens = 0
+        self.num_scheduled_tokens = 0
+        self.is_prefill = True
+        self.total_inflight_tokens = 0
 
     def append_token(self, token_id: int):
         self.token_ids.append(token_id)
