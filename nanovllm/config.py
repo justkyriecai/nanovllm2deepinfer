@@ -18,6 +18,7 @@ class Config:
     num_kvcache_blocks: int = -1
     prefill_attempt_interval: int = 70  # try prefill once every this many decode steps (scheduler.hpp:308)
     prefill_watermark: float = 0.9      # and only while KV block usage is at most this (scheduler.hpp:80)
+    stop_preempted_request: bool = False  # a preempted request ends as FINISHED_PREEMPTED instead of being recomputed (scheduler.hpp:771)
 
     def __post_init__(self):
         assert os.path.isdir(self.model)

@@ -18,8 +18,10 @@ class Scheduler:
         self.running: deque[Sequence] = deque()
         self.finished: list[Sequence] = []  # left the queues in a FINISHED_* state; blocks not yet freed
         self.preempted: list[int] = []
+        self.recomputed_tokens = 0  # num_tokens of the seqs preempted since the last step (KV thrown away); reset by LLMEngine.step
         self.prefill_attempt_interval = config.prefill_attempt_interval
         self.prefill_watermark = config.prefill_watermark
+        self.stop_preempted_request = config.stop_preempted_request
         self.decode_step = 0  # decode steps since the last prefill step (scheduler.hpp:677)
 
     def is_finished(self):
@@ -81,23 +83,25 @@ class Scheduler:
         return scheduled_seqs
 
     def _decode(self) -> list[Sequence]:
-        scheduled_seqs = []
-        while self.running and len(scheduled_seqs) < self.max_num_seqs:
-            seq = self.running.popleft()
-            while not self.block_manager.can_append(seq):
-                if self.running:
-                    self.preempt(self.running.pop())
-                else:
-                    self.preempt(seq)
-                    break
-            else:
+        running = sorted(self.running, key = lambda seq: seq.num_completion_tokens, reverse=True)
+        scheduled = []
+        l, r = 0, len(running)
+        while l < r and len(scheduled) < self.max_num_seqs:
+            seq = running[r-1]
+            while not self.block_manager.can_append(seq) and r - l > 1:
+                self.preempt(running[l])
+                l += 1
+            if self.block_manager.can_append(seq):
                 seq.num_scheduled_tokens = 1
                 seq.is_prefill = False
                 self.block_manager.may_append(seq)
-                scheduled_seqs.append(seq)
-        assert scheduled_seqs
-        self.running.extendleft(reversed(scheduled_seqs))
-        return scheduled_seqs
+                scheduled.append(seq)
+            else:
+                self.preempt(seq)
+            r -= 1
+        assert scheduled
+        self.running = deque(running[l:r]+scheduled)
+        return scheduled
 
     def schedule(self) -> tuple[list[Sequence], bool]:
         for queue in (self.running, self.waiting):
@@ -119,11 +123,16 @@ class Scheduler:
         return seqs, False
 
     def preempt(self, seq: Sequence):
-        seq.num_preemptions += 1
         self.preempted.append(seq.seq_id)
-        seq.status = SequenceStatus.WAITING
-        seq.is_prefill = True
+        self.recomputed_tokens += seq.num_tokens
+        seq.num_preemptions += 1
         self.block_manager.deallocate(seq)
+        if self.stop_preempted_request:
+            seq.status = SequenceStatus.FINISHED_PREEMPTED
+            self.finished.append(seq)
+            return
+        seq.reset_for_recompute()
+        seq.status = SequenceStatus.WAITING
         self.waiting.appendleft(seq)
 
     def postprocess(self, seqs: list[Sequence], token_ids: list[int], is_prefill: bool):
