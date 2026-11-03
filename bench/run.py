@@ -21,13 +21,21 @@ def drive(llm, requests, seed: int = 0, num_steps: int | None = None) -> float:
     from nanovllm import SamplingParams
     rng = Random(seed)
     pending = sorted(requests, key=lambda r: r.arrival_step)
-    prompts = [[rng.randint(0, 10000) for _ in range(r.prompt_len)] for r in pending]
+    shared = {}
+    prompts = []
+    for r in pending:
+        if r.prompt_id is not None and r.prompt_id in shared:
+            prompts.append(shared[r.prompt_id])
+            continue
+        prompts.append([rng.randint(0, 10000) for _ in range(r.prompt_len)])
+        if r.prompt_id is not None:
+            shared[r.prompt_id] = prompts[-1]
     i = step = engine_steps = 0
     t0 = perf_counter()
     while (i < len(pending) or not llm.is_finished()) and engine_steps != num_steps:
         while i < len(pending) and pending[i].arrival_step <= step:
             r = pending[i]
-            sp = SamplingParams(temperature=r.temperature, ignore_eos=True, max_tokens=r.max_tokens)
+            sp = SamplingParams(temperature=r.temperature, ignore_eos=True, max_tokens=r.max_tokens, n=r.n)
             llm.add_request(prompts[i], sp)
             i += 1
         if not llm.is_finished():

@@ -110,6 +110,19 @@ class BlockManager:
         seq.num_cached_tokens = 0
         seq.block_table.clear()
 
+    def pin(self, block_ids: list[int]):
+        """One more user of each block (block_manager.hpp pin_blocks)."""
+        for block_id in block_ids:
+            self.blocks[block_id].ref_count += 1
+
+    def unpin(self, block_ids: list[int]):
+        """One user fewer; a block nobody uses goes back to the free list."""
+        for block_id in block_ids:
+            block = self.blocks[block_id]
+            block.ref_count -= 1
+            if block.ref_count == 0:
+                self._deallocate_block(block_id)
+
     def can_append(self, seq: Sequence) -> bool:
         return len(self.free_block_ids) >= (len(seq) % self.block_size == 1)
 
