@@ -7,6 +7,8 @@
 | [kyrie](https://github.com/justkyriecai) | [`kyrie-main`](https://github.com/justkyriecai/nanovllm2deepinfer/tree/kyrie-main) | 2.2 做完（tag `2.2-done`） | Modal L4 | 2026-10 | 2.2：prefill 攒起来隔 70 步集中做，短请求 TBT p99 145 → 61 ms |
 | [mxt1022](https://github.com/mxt1022) |[mxt1022-main](https://github.com/mxt1022/nanovllm2deepinfer)  |  |  | 2026-10 |  |
 | [LCZcn96](https://github.com/LCZcn96) | [`LCZcn96-main`](https://github.com/LCZcn96/nanovllm2deepinfer/tree/LCZcn96-main) | 1.1 准备中 | RTX 3080 Ti Laptop 16 GB | 2026-11 | 从观测与正确性开始，计划用本地 GPU 跑通学习流程 |
+| [wumingyu33](https://github.com/justkyriecai) | [`wumingyu33-main`](https://github.com/wumingyu33/datawhal-nanovllm2deepinfer/) | 1.1 准备中 | Modal L4 | 2026-11 | 1.1：在Modal环境中看到问题现象，待补充具体步骤的详细耗时 |
+
 
 ## 怎么登记
 
