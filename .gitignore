@@ -195,3 +195,4 @@ cython_debug/
 .cursorindexingignore
 # bench outputs (traces, reports)
 out/
+*.lock

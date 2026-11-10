@@ -37,6 +37,12 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .apt_install("build-essential", "wget")  # triton compiles its launcher with gcc
     .run_commands(  # Nsight Systems CLI from NVIDIA's CUDA repo, for kernel-level timelines
+    # 创建策略覆盖文件，将 SHA1 的拒绝日期延后
+    "mkdir -p /etc/crypto-policies/back-ends",
+    """cat > /etc/crypto-policies/back-ends/apt-sequoia.config << 'EOF'
+[hash_algorithms]
+sha1.second_preimage_resistance = 2028-02-01
+EOF""",
         "wget -qO /tmp/cuda-keyring.deb https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/cuda-keyring_1.1-1_all.deb",
         "dpkg -i /tmp/cuda-keyring.deb && apt-get update && apt-get install -y --no-install-recommends nsight-systems-2026.3.2",
         "ln -sf $(ls -d /opt/nvidia/nsight-systems/*/bin/nsys | head -1) /usr/local/bin/nsys",
