@@ -5,6 +5,7 @@
 | 谁 | 进度分支 | 做到哪了 | 硬件 | 开坑 | 一句话 |
 |---|---|---|---|---|---|
 | [kyrie](https://github.com/justkyriecai) | [`kyrie-main`](https://github.com/justkyriecai/nanovllm2deepinfer/tree/kyrie-main) | 2.2 做完（tag `2.2-done`） | Modal L4 | 2026-10 | 2.2：prefill 攒起来隔 70 步集中做，短请求 TBT p99 145 → 61 ms |
+| [wumingyu33](https://github.com/wumingyu33) | [`wumingyu33-main`](https://github.com/wumingyu33/datawhal-nanovllm2deepinfer/tree/wumingyu33-main) | 1.1 准备中 | Modal L4 | 2026-11 | 从观测与正确性开始，已经在Modal上执行bench.py看到问题所在。 |
 
 ## 怎么登记
 
